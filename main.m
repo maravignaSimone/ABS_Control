@@ -2,6 +2,7 @@ clc
 clear
 close all
 
+symbolic;
 syms lambda0 real
 
 %% nominal parameters
@@ -36,7 +37,7 @@ lambda_star = 0.17;
 %lambda_star=0.131;
 
 % function for finding lambda0 of the equilibrium point
-l = -theta0_1*(1-exp(abs(lambda0)*theta0_2)-lambda0*theta0_3) - ((Cd*(v0-wind)^2)/(m*g));
+l = (Cd*(v0-wind)^2) + m*g*sign(lambda0)*theta0_1*(1-exp(-abs(lambda0)*theta0_2)-lambda0*theta0_3);
 matlabFunction(l, 'File', 'l_function');
 %%
 
