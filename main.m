@@ -5,12 +5,21 @@ close all
 symbolic;
 syms lambda0 real
 
+%% DECLARATION OF VECTOR DIMENSIONS
+
+n = 5; % state
+p = 1; % control
+q = 2; % measurement
+lm = 1; % regulated output
+ld = 2; % disturbance
+r = ld+q; % exogenous
+
 %% nominal parameters
 
 % params
 m = 250; % [kg] quarter-vehicle mass
 R = 0.3; % [m] wheel radius
-J = 1; % [kg*m^2] wheel inertia
+Ji = 1; % [kg*m^2] wheel inertia
 
 % aerodynamics
 rho = 1.225; % [kg/m^3] air density
@@ -18,8 +27,8 @@ S = 1.6*1.2; % [m^2] cross section
 CD = 2.2; % [-] drag resistance coefficient
 Cd = 0.5*rho*S*CD; % drag coefficient (1/2)*rho*S*Cd
 
-slope = 0;
-wind = 0;
+slope0 = 0;
+wind0 = 0;
 nu_w = 0;
 nu_v = 0;
 v0 = 28; % [m/s] initial velocity
@@ -37,7 +46,7 @@ lambda_star = 0.17;
 %lambda_star=0.131;
 
 % function for finding lambda0 of the equilibrium point
-l = (Cd*(v0-wind)^2) + m*g*sign(lambda0)*theta0_1*(1-exp(-abs(lambda0)*theta0_2)-lambda0*theta0_3);
+l = (Cd*(v0-wind0)^2) + m*g*sign(lambda0)*theta0_1*(1-exp(-abs(lambda0)*theta0_2)-lambda0*theta0_3);
 matlabFunction(l, 'File', 'l_function');
 %%
 
@@ -47,9 +56,9 @@ omega0 = (lam*v0 + v0)/R;
 
 %%
 
-Amat = ABS_Amatrix(Cd,J,R,m,omega0,slope,theta0_1,theta0_2,theta0_3,v0,wind);
-B1mat = ABS_B1matrix(J);
-B2mat = ABS_B2matrix(Cd,J,R,m,omega0,slope,theta0_1,theta0_2,theta0_3,v0,wind);
+Amat = ABS_Amatrix(Cd,Ji,R,m,omega0,slope0,theta0_1,theta0_2,theta0_3,v0,wind0);
+B1mat = ABS_B1matrix(Ji);
+B2mat = ABS_B2matrix(Cd,Ji,R,m,omega0,slope0,theta0_1,theta0_2,theta0_3,v0,wind0);
 Cmat = ABS_Cmatrix(nu_w);
 D1mat = ABS_D1matrix;
 D2mat = ABS_D2matrix(omega0);
@@ -89,3 +98,19 @@ Omat = obsv(Amat,Cmat);
 
 rank(Rmat)
 rank(Omat)
+
+%%
+PLANT = 0;
+tilde_x_init = [0; 0; 0; 0; 0];
+u0 = 0;
+w0 = [0 0 0 0]';
+
+%% RUN THE SIMULATOR
+TimeSpan = 100;
+DT = 1e-8;
+out = sim('SimulinkModel',TimeSpan);
+save CurrentWorkspace
+
+%% PLOT RESULTS
+
+run plotResults
