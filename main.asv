@@ -55,7 +55,7 @@ matlabFunction(l, 'File', 'l_function');
 lambda0 = fsolve(@l_function,0);
 
 %omega0 = (lambda0*v0 + v0)/R;
-omega0 = - v0/(R*(lambda0-1));
+omega0 = - v0/(lambda0*(R-1));
 
 tb0 = 2000;
 

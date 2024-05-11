@@ -21,7 +21,7 @@ x = [v; omega; theta];
 u = Tb;
 d = [wind; slope];
 nu = [nu_w; nu_v];
-w = [d; nu];
+w = [d; nu]; % eventually add lambda_star
 
 %% DEFINE EQUATIONS
 % Aerodynamic drag
@@ -44,7 +44,7 @@ f = [-(Fx/m)-(D/m)+g*sin(slope); R*(Fx/J)-Tb/J; 0; 0; 0];
 
 % System outputs
 h = [omega * (1 + nu_w); v + nu_v];
-he = omega*(1 + nu_w) - ((v + nu_v)/R)*(1-lambda_star);
+he = omega*(1 + nu_w) - ((v + nu_v)/R)*(1+lambda_star);
 
 %% computing matrices
 A = jacobian(f, x);
