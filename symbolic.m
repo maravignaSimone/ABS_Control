@@ -34,13 +34,13 @@ N = (m*g)*cos(slope);
 lambda = ((omega*R)-v)/v;
 
 % Friction coefficient (Burckhardt model) (sign(lambda) = - 1 when braking)
-mu = sign(lambda) * theta1 * (1-exp(-abs(lambda)*theta2)-(lambda*theta3));
+mu = sign(lambda) * theta1 * (1-exp(-abs(lambda)*theta2))-(lambda*theta3);
 
 % Friction forces
 Fx = N * mu;
 
 % System dynamics
-f = [-(Fx/m)-(D/m)+g*sin(slope); R*(Fx/J)-Tb/J; 0; 0; 0];
+f = [(Fx/m)-(D/m)+g*sin(slope); R*(-Fx/J)-Tb/J; 0; 0; 0];
 
 % System outputs
 h = [omega * (1 + nu_w); v + nu_v];

@@ -48,7 +48,7 @@ lambda_star = -0.17;
 %lambda_star= -0.131;
 
 % function for finding lambda0 of the equilibrium point
-l = (Cd*(v0-wind0)^2) + m*g*sign(lambda0)*theta0_1*(1-exp(-abs(lambda0)*theta0_2)-(lambda0*theta0_3));
+l = (Cd*(v0-wind0)^2) + m*g*sign(lambda0)*theta0_1*(1-exp(-abs(lambda0)*theta0_2))-(lambda0*theta0_3);
 matlabFunction(l, 'File', 'l_function');
 %%
 
