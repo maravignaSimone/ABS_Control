@@ -3,7 +3,7 @@ clear
 close all
 
 symbolic;
-syms lambda0 real
+syms Tb_eq lambda_eq real
 
 %% DECLARATION OF VECTOR DIMENSIONS
 
@@ -12,7 +12,7 @@ p = 1; % control
 q = 2; % measurement
 lm = 1; % regulated output
 ld = 2; % disturbance
-r = ld+q; % exogenous
+r = ld+q+lm; % exogenous
 
 %% nominal parameters
 
@@ -28,8 +28,6 @@ CD = 2.2; % [-] drag resistance coefficient
 Cd = 0.5*rho*S*CD; % drag coefficient (1/2)*rho*S*Cd
 
 %% Linearization Conditions
-v0 = 28; % [m/s] initial velocity
-
 slope0 = 0;
 wind0 = 0;
 nu_w = 0;
@@ -47,31 +45,28 @@ lambda_star = -0.17;
 %theta0_3 = 0.35;
 %lambda_star= -0.131;
 
-% function for finding lambda0 of the equilibrium point
-l = (Cd*(v0-wind0)^2) + m*g*sign(lambda0)*theta0_1*(1-exp(-abs(lambda0)*theta0_2))-(lambda0*theta0_3);
-matlabFunction(l, 'File', 'l_function');
+v0 = 28; % [m/s] initial velocity
+
 %%
 
-lambda0 = fsolve(@l_function,0);
+% function for finding lambda0 of the equilibrium point
+eqn1 = g*cos(slope0)*(sign(lambda_eq) * theta0_1 * (1-exp(-abs(lambda_eq)*theta0_2))-(lambda_eq*theta0_3)) - (Cd/m)*(v0-wind0)^2 -g*sin(slope0);
+eqn2 = Tb_eq/Ji - (R/Ji)*(m*g*cos(slope0)*(sign(lambda_eq) * theta0_1 * (1-exp(-abs(lambda_eq)*theta0_2))-(lambda_eq*theta0_3)));
 
-%omega0 = (lambda0*v0 + v0)/R;
-omega0 = - v0/(R*(lambda0-1));
+f1 = matlabFunction(eqn1, 'Vars', [Tb_eq, lambda_eq]);
+f2 = matlabFunction(eqn2, 'Vars', [Tb_eq, lambda_eq]);
 
-tb0 = 2000;
+fun = @(var) [f1(var(1), var(2)); f2(var(1), var(2))];
 
-theta0 = [theta0_1; theta0_2; theta0_3];
+var0 = [0; 0];
 
-x0 = [v0; omega0; theta0];
+var = fsolve(fun, var0);
 
-u0 = tb0;
+Tb_eq = var(1);
+lambda_eq = var(2);
 
-d0 = [wind0; slope0];
-
-w0 = [d0; nu_w; nu_v];
-
-y0 = [x0(2); x0(1)];
-
-e0 = 0;
+%omega0 = (lambda_eq*v0 + v0)/R;
+omega0 = - v0/(R*(lambda_eq-1));
 
 %% Linearized plant
 %state
@@ -87,7 +82,7 @@ D2mat = ABS_D2matrix(omega0);
 %error
 Cemat = ABS_Cematrix(R,lambda_star,nu_w);
 D1emat = ABS_D1ematrix;
-D2emat = ABS_D2ematrix(R,lambda_star,omega0);
+D2emat = ABS_D2ematrix(R,lambda_star,nu_v,omega0,v0);
 
 %% Jordan Canonical Form
 [V,Vn,J] = JCF(Amat);
@@ -122,7 +117,22 @@ Omat = obsv(Amat,Cmat);
 rank(Rmat)
 rank(Omat)
 
-%% INITIAL CONDITIONS FOR THE NONLINEAR PLANT
+%% INITIAL CONDITIONS
+tb0 = -Tb_eq;
+
+theta0 = [theta0_1; theta0_2; theta0_3];
+
+x0 = [v0; omega0; theta0];
+
+u0 = tb0;
+
+d0 = [wind0; slope0];
+
+w0 = [d0; nu_w; nu_v; lambda_star];
+
+y0 = [x0(2); x0(1)];
+
+e0 = 0;
 
 v_init = v0; % [m/s] vehicle speed
 omega_init = v_init/R; % [rad/s] rear wheel speed
@@ -131,10 +141,10 @@ x_init = [v_init; omega_init; theta0_1; theta0_2; theta0_3];
 
 %% RUN THE SIMULATOR
 PLANT = 0; % 0 = linear, 1 = nonlinear
-TimeSpan = 200;
+TimeSpan = 3;
 DT = 1e-6;
 %% Simulink model
-%out = sim('SimulinkModel',TimeSpan);
+out = sim('SimulinkModel',TimeSpan);
 %save CurrentWorkspace
 
 %% PLOT RESULTS

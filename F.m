@@ -16,7 +16,7 @@ nu = w(3:4); % [GNSS sensor [m/s]
 %               tone-wheel [rad/s]];
 
 % REFERENCE
-% none
+ref = w(5);
 
 % CONTROL
 Tb = u; % [Nm] rear wheel torque
@@ -42,7 +42,7 @@ N = m*g*cos(slope);
 Fx = N * mu_w;
 
 % system dynamics
-dot_x = [g*sin(slope)-Fx/m-D(v-wind)/m; (-Tb + Fx*R)/Ji; 0; 0; 0];
+dot_x = [-g*sin(slope)+Fx/m-D(v-wind)/m; (Tb - Fx*R)/Ji; 0; 0; 0];
 
 %% MEASUREMENTS
 
@@ -50,7 +50,7 @@ y = [omega*(1+nu(1)); v + nu(2)];
 
 %% CONTROLLED VARIABLES
 
-lambda_star = -0.17;
+lambda_star = ref;
 e = y(1)-y(2)/R*(1+lambda_star);
 
 end

@@ -4,7 +4,7 @@ close all
 
 %% DEFINE VARIABLES
 %Params
-syms Cd m R J lambda_star real
+syms Cd m R J real
 g = 9.81;
 %State 
 syms v omega theta1 theta2 theta3 real
@@ -14,6 +14,8 @@ syms Tb real
 syms slope wind real
 %Noise
 syms nu_w nu_v real
+%Reference
+syms lambda_star real
 
 %% DEFINE VECTORS
 theta = [theta1; theta2; theta3];
@@ -21,7 +23,8 @@ x = [v; omega; theta];
 u = Tb;
 d = [wind; slope];
 nu = [nu_w; nu_v];
-w = [d; nu]; % eventually add lambda_star
+ref = lambda_star;
+w = [d; nu; ref];
 
 %% DEFINE EQUATIONS
 % Aerodynamic drag
@@ -40,11 +43,11 @@ mu = sign(lambda) * theta1 * (1-exp(-abs(lambda)*theta2))-(lambda*theta3);
 Fx = N * mu;
 
 % System dynamics
-f = [(Fx/m)-(D/m)+g*sin(slope); R*(-Fx/J)-Tb/J; 0; 0; 0];
+f = [(Fx/m)-(D/m)-g*sin(slope); R*(-Fx/J)+Tb/J; 0; 0; 0];
 
 % System outputs
 h = [omega * (1 + nu_w); v + nu_v];
-he = omega*(1 + nu_w) - ((v + nu_v)/R)*(1+lambda_star);
+he = omega*(1 + nu_w) - ((v + nu_v)/R)*(1+lambda_star); % lambda - lambda_star 
 
 %% computing matrices
 A = jacobian(f, x);
