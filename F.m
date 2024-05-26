@@ -5,7 +5,7 @@ function [dot_x,y,e] = F(x,u,w)
 % STATES
 v = x(1); % [m/s] vehicle speed
 omega = x(2); % [rad/s] wheel speed
-theta = x(3:5);
+theta2 = x(3); % theta2
 
 % DISTURBANCE
 wind = w(1);  % [m/s] wind speed
@@ -27,12 +27,13 @@ m = 250; % [kg] quarter-vehicle mass
 g = 9.81; % [m/s^2] gravity acceleration
 Ji = 1; % [kg*m^2] rear wheel inertia
 R = 0.3; % [m] rear wheel radius
-
+theta0_1=1.28;
+theta0_3=0.52; 
 %% STATE DYNAMICS
 
 % slip ratio
 lambda_w = lambda(v,omega*R);
-
+theta = [theta0_1 theta2 theta0_3];
 mu_w = mu(lambda_w,theta);
 
 % wheel load
@@ -42,7 +43,7 @@ N = m*g*cos(slope);
 Fx = N * mu_w;
 
 % system dynamics
-dot_x = [-g*sin(slope)+Fx/m-D(v-wind)/m; (Tb - Fx*R)/Ji; 0; 0; 0];
+dot_x = [-g*sin(slope)+Fx/m-D(v-wind)/m; (Tb - Fx*R)/Ji; 0];
 
 %% MEASUREMENTS
 

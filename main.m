@@ -7,7 +7,7 @@ syms Tb_eq lambda_eq real
 
 %% DECLARATION OF VECTOR DIMENSIONS
 
-n = 5; % state
+n = 3; % state
 p = 1; % control
 q = 2; % measurement
 lm = 1; % regulated output
@@ -20,7 +20,8 @@ r = ld+q+lm; % exogenous
 m = 250; % [kg] quarter-vehicle mass
 R = 0.3; % [m] wheel radius
 Ji = 1; % [kg*m^2] wheel inertia
-
+theta0_1=1.28;
+theta0_3=0.52;
 % aerodynamics
 rho = 1.225; % [kg/m^3] air density
 S = 1.6*1.2; % [m^2] cross section
@@ -35,9 +36,7 @@ nu_v = 0;
 
 % friction coefficients
 %dry asphalt
-theta0_1=1.28;
 theta0_2=23.99;
-theta0_3=0.52;
 lambda_star = -0.17;
 %wet asphalt
 %theta0_1 = 0.86;
@@ -94,7 +93,7 @@ for kk = 1:n
     figure
     h = spider_plot(VV,...
         'AxesLimits', [zeros(1,n); 100*ones(1,n)],...
-        'AxesLabels', {'$z_1$', '$z_2$','$z_3$','$z_4$','$z_5$'},...
+        'AxesLabels', {'$z_1$', '$z_2$','$z_3$'},...
         'AxesLabelsEdge', 'none',...
         'AxesInterpreter', 'latex',...
         'AxesTickLabels', 'data',...
@@ -122,7 +121,7 @@ tb0 = -Tb_eq;
 
 theta0 = [theta0_1; theta0_2; theta0_3];
 
-x0 = [v0; omega0; theta0];
+x0 = [v0; omega0; theta0(2)];
 
 u0 = tb0;
 
@@ -137,11 +136,11 @@ e0 = 0;
 v_init = v0; % [m/s] vehicle speed
 omega_init = v_init/R; % [rad/s] rear wheel speed
 
-x_init = [v_init; omega_init; theta0_1; theta0_2; theta0_3];
+x_init = [v_init; omega_init; theta0_2];
 
 %% RUN THE SIMULATOR
 PLANT = 0; % 0 = linear, 1 = nonlinear
-TimeSpan = 3;
+TimeSpan = 5;
 DT = 1e-6;
 %% Simulink model
 out = sim('SimulinkModel',TimeSpan);
