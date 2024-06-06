@@ -138,12 +138,69 @@ omega_init = v_init/R; % [rad/s] rear wheel speed
 
 x_init = [v_init; omega_init; theta0_2];
 
+%% KALMAN
+
+[A_bar, B1_bar, C_bar, T, k] = ctrbf(Amat, B1mat, Cmat);
+
+% Controllable part
+Acc = A_bar(k+1:end, k+1:end);
+Bcc = B1_bar(k+1:end, :);
+Ccc = C_bar(:, k+1:end);
+
+% Unontrollable part
+Auc = A_bar(1:k, 1:k);
+Buc = B1_bar(1:k, :);
+Cuc = C_bar(:, 1:k);
+
+% Augment with integral action
+n_c = size(Acc, 1);
+
+%% STATE FEEDBACK CONTROL + INTEGRAL ACTION
+
+Ae = [Acc zeros(n_c, lm)
+    Cemat(:, 1:k+1) zeros(lm, lm)];
+
+Be = [Bcc;
+    D1emat];
+
+Ceps = eye(n_c+lm);
+
+Deps = zeros(n_c+lm, p);
+
+eps1max = 100;
+eps2max = 100;
+eps3max = 100;
+
+Q = inv(length(Ceps)*diag([eps1max ^2,eps2max^2, eps3max^2]));
+
+umax = 100;
+
+R = inv(p*diag(umax ^2));
+
+barR = R + Deps.'*Q*Deps;
+
+alpha = 0;
+
+Am = Ae + alpha*eye(n_c+lm);
+Em = eye(n_c+lm);
+Bm = Be;
+Gm = 0;
+Qm = Ceps.'*Q*Ceps;
+Sm = Ceps.'*Q*Deps;
+Rm = barR;
+
+[X, Km, L] = icare (Am, Bm, Qm, Rm, Sm, Em, Gm);
+K = -Km;
+% Extract Ks and Ki from K
+KS = K(:, 1:n_c);
+KI = K(:, n_c+1:end);
+
 %% RUN THE SIMULATOR
 PLANT = 0; % 0 = linear, 1 = nonlinear
 TimeSpan = 5;
 DT = 1e-6;
 %% Simulink model
-out = sim('SimulinkModel',TimeSpan);
+%out = sim('SimulinkModel',TimeSpan);
 %save CurrentWorkspace
 
 %% PLOT RESULTS
