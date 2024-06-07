@@ -27,13 +27,13 @@ m = 250; % [kg] quarter-vehicle mass
 g = 9.81; % [m/s^2] gravity acceleration
 Ji = 1; % [kg*m^2] rear wheel inertia
 R = 0.3; % [m] rear wheel radius
-theta0_1=1.28;
-theta0_3=0.52; 
+theta1=1.28;
+theta3=0.52; 
 %% STATE DYNAMICS
 
 % slip ratio
 lambda_w = lambda(v,omega*R);
-theta = [theta0_1 theta2 theta0_3];
+theta = [theta1 theta2 theta3];
 mu_w = mu(lambda_w,theta);
 
 % wheel load

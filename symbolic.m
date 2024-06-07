@@ -4,10 +4,10 @@ close all
 
 %% DEFINE VARIABLES
 %Params
-syms Cd m R J theta2 theta3 real
+syms Cd m R J theta1 theta3 real
 g = 9.81;
 %State 
-syms v omega theta1 real
+syms v omega theta2 real
 %Controls
 syms Tb real
 %Disturbances

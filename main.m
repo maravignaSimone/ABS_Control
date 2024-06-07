@@ -20,8 +20,8 @@ r = ld+q+lm; % exogenous
 m = 250; % [kg] quarter-vehicle mass
 R = 0.3; % [m] wheel radius
 Ji = 1; % [kg*m^2] wheel inertia
-theta0_1=1.28;
-theta0_3=0.52;
+theta1=1.28;
+theta3=0.52;
 % aerodynamics
 rho = 1.225; % [kg/m^3] air density
 S = 1.6*1.2; % [m^2] cross section
@@ -39,9 +39,9 @@ nu_v = 0;
 theta0_2=23.99;
 lambda_star = -0.17;
 %wet asphalt
-%theta0_1 = 0.86;
+%theta1 = 0.86;
 %theta0_2 = 33.82;
-%theta0_3 = 0.35;
+%theta3 = 0.35;
 %lambda_star= -0.131;
 
 v0 = 28; % [m/s] initial velocity
@@ -49,8 +49,8 @@ v0 = 28; % [m/s] initial velocity
 %%
 
 % function for finding lambda0 of the equilibrium point
-eqn1 = g*cos(slope0)*(sign(lambda_eq) * theta0_1 * (1-exp(-abs(lambda_eq)*theta0_2))-(lambda_eq*theta0_3)) - (Cd/m)*(v0-wind0)^2 -g*sin(slope0);
-eqn2 = Tb_eq/Ji - (R/Ji)*(m*g*cos(slope0)*(sign(lambda_eq) * theta0_1 * (1-exp(-abs(lambda_eq)*theta0_2))-(lambda_eq*theta0_3)));
+eqn1 = g*cos(slope0)*(sign(lambda_eq) * theta1 * (1-exp(-abs(lambda_eq)*theta0_2))-(lambda_eq*theta3)) - (Cd/m)*(v0-wind0)^2 -g*sin(slope0);
+eqn2 = Tb_eq/Ji - (R/Ji)*(m*g*cos(slope0)*(sign(lambda_eq) * theta1 * (1-exp(-abs(lambda_eq)*theta0_2))-(lambda_eq*theta3)));
 
 f1 = matlabFunction(eqn1, 'Vars', [Tb_eq, lambda_eq]);
 f2 = matlabFunction(eqn2, 'Vars', [Tb_eq, lambda_eq]);
@@ -69,9 +69,9 @@ omega0 = - v0/(R*(lambda_eq-1));
 
 %% Linearized plant
 %state
-Amat = ABS_Amatrix(Cd,Ji,R,m,omega0,slope0,theta0_1,theta0_2,theta0_3,v0,wind0);
+Amat = ABS_Amatrix(Cd,Ji,R,m,omega0,slope0,theta1,theta0_2,theta3,v0,wind0);
 B1mat = ABS_B1matrix(Ji);
-B2mat = ABS_B2matrix(Cd,Ji,R,m,omega0,slope0,theta0_1,theta0_2,theta0_3,v0,wind0);
+B2mat = ABS_B2matrix(Cd,Ji,R,m,omega0,slope0,theta1,theta0_2,theta3,v0,wind0);
 
 %output
 Cmat = ABS_Cmatrix(nu_w);
@@ -113,13 +113,13 @@ end
 Rmat = ctrb(Amat,B1mat);
 Omat = obsv(Amat,Cmat);
 
-rank(Rmat)
-rank(Omat)
+disp(strcat("The reachable states are: ", num2str(rank(Rmat))));
+disp(strcat("The observable states are: ", num2str(rank(Omat))));
 
 %% INITIAL CONDITIONS
 tb0 = -Tb_eq;
 
-theta0 = [theta0_1; theta0_2; theta0_3];
+theta0 = [theta1; theta0_2; theta3];
 
 x0 = [v0; omega0; theta0(2)];
 
@@ -154,6 +154,9 @@ Cuc = C_bar(:, 1:k);
 
 % Augment with integral action
 n_c = size(Acc, 1);
+
+% Pick the equivalent state and tell what are the reachable ones
+eq = T*x; disp(strcat("A reachable states is: ", string(eq(k+1:end))));
 
 %% STATE FEEDBACK CONTROL + INTEGRAL ACTION
 
@@ -194,13 +197,13 @@ K = -Km;
 % Extract Ks and Ki from K
 KS = K(:, 1:n_c);
 KI = K(:, n_c+1:end);
-
+KS = [0 KS];
 %% RUN THE SIMULATOR
 PLANT = 0; % 0 = linear, 1 = nonlinear
-TimeSpan = 5;
+TimeSpan = 7;
 DT = 1e-6;
 %% Simulink model
-%out = sim('SimulinkModel',TimeSpan);
+out = sim('SimulinkModel',TimeSpan);
 %save CurrentWorkspace
 
 %% PLOT RESULTS
