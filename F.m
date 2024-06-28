@@ -60,10 +60,12 @@ end
 
 % slip ratio
 function L = lambda(v,omegar)
-if abs(v-omegar) <= 1e-3  % pure rolling / at rest
+if abs(v-omegar) <= 1e-4  % pure rolling / at rest
     L = 0;
 else
-    L = (omegar-v)/v; % braking
+    vmax = max(abs(v),abs(omegar));
+    vmax = max(vmax,abs(omegar-v));
+    L = (omegar-v)/vmax; % driving / braking
 end
 end
 

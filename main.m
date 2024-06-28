@@ -44,7 +44,7 @@ lambda_star = -0.17;
 %theta3 = 0.35;
 %lambda_star= -0.131;
 
-v0 = 28; % [m/s] initial velocity
+v0 = 14; % [m/s] initial velocity
 
 %%
 
@@ -172,11 +172,11 @@ Deps = zeros(n_c+lm, p);
 
 eps1max = 100;
 eps2max = 100;
-eps3max = 100;
+eps3max = 1;
 
 Q = inv(length(Ceps)*diag([eps1max ^2,eps2max^2, eps3max^2]));
 
-umax = 100;
+umax = 500;
 
 R = inv(p*diag(umax ^2));
 
@@ -197,13 +197,12 @@ K = -Km;
 % Extract Ks and Ki from K
 KS = K(:, 1:n_c);
 KI = K(:, n_c+1:end);
-KS = [0 KS];
 %% RUN THE SIMULATOR
 PLANT = 0; % 0 = linear, 1 = nonlinear
-TimeSpan = 7;
+TimeSpan = 4;
 DT = 1e-6;
 %% Simulink model
-out = sim('SimulinkModel',TimeSpan);
+%out = sim('SimulinkModel',TimeSpan);
 %save CurrentWorkspace
 
 %% PLOT RESULTS
