@@ -83,6 +83,10 @@ Cemat = ABS_Cematrix(R,lambda_star,nu_w);
 D1emat = ABS_D1ematrix;
 D2emat = ABS_D2ematrix(R,lambda_star,nu_v,omega0,v0);
 
+% he: lambda - lambda_star
+% Cemat = ABS_Cematrix(R,nu_v,nu_w, omega0, v0);
+% D1emat = ABS_D1ematrix;
+% D2emat = ABS_D2ematrix(R,nu_v,nu_w,omega0,v0);
 %% Jordan Canonical Form
 [V,Vn,J] = JCF(Amat);
 
@@ -176,7 +180,7 @@ eps3max = 1;
 
 Q = inv(length(Ceps)*diag([eps1max ^2,eps2max^2, eps3max^2]));
 
-umax = 500;
+umax = 300;
 
 R = inv(p*diag(umax ^2));
 
@@ -202,7 +206,7 @@ PLANT = 0; % 0 = linear, 1 = nonlinear
 TimeSpan = 4;
 DT = 1e-6;
 %% Simulink model
-%out = sim('SimulinkModel',TimeSpan);
+out = sim('SimulinkModel',TimeSpan);
 %save CurrentWorkspace
 
 %% PLOT RESULTS

@@ -48,6 +48,7 @@ f = [(Fx/m)-(D/m)-g*sin(slope); R*(-Fx/J)+Tb/J; 0];
 % System outputs
 h = [omega * (1 + nu_w); v + nu_v];
 he = omega*(1 + nu_w) - ((v + nu_v)/R)*(1+lambda_star); % w(i.e. y_tacho) - w_r(i.e. w @ lambda_star) 
+% he = ((omega*(1 + nu_w)*R)-(v + nu_v))/(v + nu_v) - lambda_star;
 
 %% computing matrices
 A = jacobian(f, x);
