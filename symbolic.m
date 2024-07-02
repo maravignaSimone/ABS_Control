@@ -23,8 +23,7 @@ x = [v; omega; theta(2)];
 u = Tb;
 d = [wind; slope];
 nu = [nu_w; nu_v];
-ref = lambda_star;
-w = [d; nu; ref];
+w = [d; nu];
 
 %% DEFINE EQUATIONS
 % Aerodynamic drag

@@ -12,13 +12,13 @@ p = 1; % control
 q = 2; % measurement
 lm = 1; % regulated output
 ld = 2; % disturbance
-r = ld+q+lm; % exogenous
+r = ld+q; % exogenous
 
 %% nominal parameters
 
 % params
 m = 250; % [kg] quarter-vehicle mass
-R = 0.3; % [m] wheel radius
+R_w = 0.3; % [m] wheel radius
 Ji = 1; % [kg*m^2] wheel inertia
 theta1=1.28;
 theta3=0.52;
@@ -50,7 +50,7 @@ v0 = 14; % [m/s] initial velocity
 
 % function for finding lambda0 of the equilibrium point
 eqn1 = g*cos(slope0)*(sign(lambda_eq) * theta1 * (1-exp(-abs(lambda_eq)*theta0_2))-(lambda_eq*theta3)) - (Cd/m)*(v0-wind0)^2 -g*sin(slope0);
-eqn2 = Tb_eq/Ji - (R/Ji)*(m*g*cos(slope0)*(sign(lambda_eq) * theta1 * (1-exp(-abs(lambda_eq)*theta0_2))-(lambda_eq*theta3)));
+eqn2 = Tb_eq/Ji - (R_w/Ji)*(m*g*cos(slope0)*(sign(lambda_eq) * theta1 * (1-exp(-abs(lambda_eq)*theta0_2))-(lambda_eq*theta3)));
 
 f1 = matlabFunction(eqn1, 'Vars', [Tb_eq, lambda_eq]);
 f2 = matlabFunction(eqn2, 'Vars', [Tb_eq, lambda_eq]);
@@ -65,13 +65,13 @@ Tb_eq = var(1);
 lambda_eq = var(2);
 
 %omega0 = (lambda_eq*v0 + v0)/R;
-omega0 = - v0/(R*(lambda_eq-1));
+omega0 = - v0/(R_w*(lambda_eq-1));
 
 %% Linearized plant
 %state
-Amat = ABS_Amatrix(Cd,Ji,R,m,omega0,slope0,theta1,theta0_2,theta3,v0,wind0);
+Amat = ABS_Amatrix(Cd,Ji,R_w,m,omega0,slope0,theta1,theta0_2,theta3,v0,wind0);
 B1mat = ABS_B1matrix(Ji);
-B2mat = ABS_B2matrix(Cd,Ji,R,m,omega0,slope0,theta1,theta0_2,theta3,v0,wind0);
+B2mat = ABS_B2matrix(Cd,Ji,R_w,m,omega0,slope0,theta1,theta0_2,theta3,v0,wind0);
 
 %output
 Cmat = ABS_Cmatrix(nu_w);
@@ -79,14 +79,14 @@ D1mat = ABS_D1matrix;
 D2mat = ABS_D2matrix(omega0);
 
 %error
-Cemat = ABS_Cematrix(R,lambda_star,nu_w);
+Cemat = ABS_Cematrix(R_w,lambda_star,nu_w);
 D1emat = ABS_D1ematrix;
-D2emat = ABS_D2ematrix(R,lambda_star,nu_v,omega0,v0);
+D2emat = ABS_D2ematrix(R_w,lambda_star,omega0);
 
 % he: lambda - lambda_star
-% Cemat = ABS_Cematrix(R,nu_v,nu_w, omega0, v0);
+% Cemat = ABS_Cematrix(R_w,nu_v,nu_w, omega0, v0);
 % D1emat = ABS_D1ematrix;
-% D2emat = ABS_D2ematrix(R,nu_v,nu_w,omega0,v0);
+% D2emat = ABS_D2ematrix(R_w,nu_v,nu_w,omega0,v0);
 %% Jordan Canonical Form
 [V,Vn,J] = JCF(Amat);
 
@@ -121,7 +121,7 @@ disp(strcat("The reachable states are: ", num2str(rank(Rmat))));
 disp(strcat("The observable states are: ", num2str(rank(Omat))));
 
 %% INITIAL CONDITIONS
-tb0 = -Tb_eq;
+tb0 = Tb_eq;
 
 theta0 = [theta1; theta0_2; theta3];
 
@@ -131,14 +131,14 @@ u0 = tb0;
 
 d0 = [wind0; slope0];
 
-w0 = [d0; nu_w; nu_v; lambda_star];
+w0 = [d0; nu_w; nu_v];
 
 y0 = [x0(2); x0(1)];
 
 e0 = 0;
 
 v_init = v0; % [m/s] vehicle speed
-omega_init = v_init/R; % [rad/s] rear wheel speed
+omega_init = v_init/R_w; % [rad/s] rear wheel speed
 
 x_init = [v_init; omega_init; theta0_2];
 
@@ -204,9 +204,9 @@ KI = K(:, n_c+1:end);
 %% RUN THE SIMULATOR
 PLANT = 0; % 0 = linear, 1 = nonlinear
 TimeSpan = 4;
-DT = 1e-6;
+DT = 1e-4;
 %% Simulink model
-out = sim('SimulinkModel',TimeSpan);
+%out = sim('SimulinkModel',TimeSpan);
 %save CurrentWorkspace
 
 %% PLOT RESULTS
