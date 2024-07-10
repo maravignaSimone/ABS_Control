@@ -52,8 +52,9 @@ y = [omega*(1+nu(1)); v + nu(2)];
 %% CONTROLLED VARIABLES
 
 lambda_star = -0.17;
-e = y(1)-(y(2)/R_w)*(1+lambda_star);
+%e = y(1)-(y(2)/R_w)*(1+lambda_star);
 % e = ((y(1)*R)-y(2))/y(2) - lambda_star;
+e = ((y(1)*R_w - y(2)) / y(2)) - lambda_star;
 end
 
 %% SUPPORT FUNCTIONS

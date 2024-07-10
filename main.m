@@ -44,7 +44,7 @@ lambda_star = -0.17;
 %theta3 = 0.35;
 %lambda_star= -0.131;
 
-v0 = 14; % [m/s] initial velocity
+v0 = 20; % [m/s] initial velocity
 
 %%
 
@@ -79,9 +79,9 @@ D1mat = ABS_D1matrix;
 D2mat = ABS_D2matrix(omega0);
 
 %error
-Cemat = ABS_Cematrix(R_w,lambda_star,nu_w);
+Cemat = ABS_Cematrix(R_w,nu_v, nu_w, omega0, v0);
 D1emat = ABS_D1ematrix;
-D2emat = ABS_D2ematrix(R_w,lambda_star,omega0);
+D2emat = ABS_D2ematrix(R_w,nu_v, nu_w, omega0, v0);
 
 % he: lambda - lambda_star
 % Cemat = ABS_Cematrix(R_w,nu_v,nu_w, omega0, v0);
@@ -174,13 +174,13 @@ Ceps = eye(n_c+lm);
 
 Deps = zeros(n_c+lm, p);
 
-eps1max = 100;
-eps2max = 100;
-eps3max = 1;
+eps1max = v0; % related to v variation
+eps2max = omega0; % related to omega variation
+eps3max = 0.01; % related to eta variation
 
 Q = inv(length(Ceps)*diag([eps1max ^2,eps2max^2, eps3max^2]));
 
-umax = 300;
+umax = 500; % related to u (torque) variation
 
 R = inv(p*diag(umax ^2));
 
@@ -201,12 +201,28 @@ K = -Km;
 % Extract Ks and Ki from K
 KS = K(:, 1:n_c);
 KI = K(:, n_c+1:end);
-%% RUN THE SIMULATOR
+% SETUP THE SIMULATOR
 PLANT = 0; % 0 = linear, 1 = nonlinear
-TimeSpan = 4;
+TimeSpan = 6;
 DT = 1e-4;
-%% Simulink model
-%out = sim('SimulinkModel',TimeSpan);
+% RUN Simulink model and PLOT the Results
+out = sim('SimulinkModel',TimeSpan);
+f = figure('Name','Measured Data','NumberTitle','off');
+t=tiledlayout(2, 2);
+nexttile;
+plot(out.linear.y, LineWidth=1);
+legend("omega", "v");
+title("Measurements $\tilde{y}$", Interpreter="latex");
+nexttile;
+plot(out.linear.e, LineWidth=1);
+title("Error $\tilde{e}$", Interpreter="latex");
+nexttile;
+plot(out.linear.u, LineWidth=1);
+title("Control: Torque $\tilde{u}$", Interpreter="latex");
+nexttile;
+plot(out.lambda, LineWidth=1);
+title("Slip Ratio $\lambda$", Interpreter="latex");
+title(t, strcat("Result of the control with $\epsilon_1$=",num2str(eps1max), ", $\epsilon_2$=", num2str(eps2max), ", $\epsilon_3$=", num2str(eps3max), ", $u_{max}$=", num2str(umax)), Interpreter="latex");
 %save CurrentWorkspace
 
 %% PLOT RESULTS
