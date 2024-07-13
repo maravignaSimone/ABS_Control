@@ -233,13 +233,16 @@ Emd = eye(n);
 Gmd = 0;
 
 [X, Kmd, L] = icare (Amd, Bmd, Qmd, Rmd, Smd, Emd, Gmd);
-% KO = Kmd.';
-% 
-% AO = Amat - KO*Cmat;
-% BO = B1mat - KO*D1mat;
-% CO = eye(n);
-% DO = zeros(n, q);
-% XOinit = x_tilde_init;
+KO = Kmd.';
+
+AO = Amat - KO*Cmat;
+BO = B1mat - KO*D1mat;
+CO = eye(n);
+DO = zeros(n, q);
+XOinit = x_init - x0;
+
+%% FEED FORWARD
+
 
 %% RUN THE SIMULATOR
 PLANT = 1; % 0 = linear, 1 = nonlinear
