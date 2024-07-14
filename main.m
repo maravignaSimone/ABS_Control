@@ -204,7 +204,7 @@ KS = K(:, 1:n_c);
 KI = K(:, n_c+1:end);
 
 %% OBSERVER
-lambda_d = 0;
+lambda_d = 1;
 Ad = Amat.';
 Bd = Cmat.';
 Cd = B2mat.';
@@ -246,7 +246,7 @@ XOinit = x_init - x0;
 
 %% RUN THE SIMULATOR
 PLANT = 1; % 0 = linear, 1 = nonlinear
-TimeSpan = 1.5;
+TimeSpan = 6;
 DT = 1e-4;
 
 % plots
