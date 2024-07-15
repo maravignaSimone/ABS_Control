@@ -176,7 +176,7 @@ Deps = zeros(n_c+lm, p);
 
 eps1max = v0; % related to v variation
 eps2max = omega0; % related to omega variation
-eps3max = 0.01; % related to eta variation
+eps3max = 0.001; % related to eta variation
 
 Q = inv(length(Ceps)*diag([eps1max ^2,eps2max^2, eps3max^2]));
 
@@ -202,8 +202,8 @@ K = -Km;
 KS = K(:, 1:n_c);
 KI = K(:, n_c+1:end);
 % SETUP THE SIMULATOR
-PLANT = 0; % 0 = linear, 1 = nonlinear
-TimeSpan = 6;
+PLANT = 1; % 0 = linear, 1 = nonlinear
+TimeSpan = 10;
 DT = 1e-4;
 % RUN Simulink model and PLOT the Results
 out = sim('SimulinkModel',TimeSpan);
@@ -225,6 +225,4 @@ title("Slip Ratio $\lambda$", Interpreter="latex");
 title(t, strcat("Result of the control with $\epsilon_1$=",num2str(eps1max), ", $\epsilon_2$=", num2str(eps2max), ", $\epsilon_3$=", num2str(eps3max), ", $u_{max}$=", num2str(umax)), Interpreter="latex");
 %save CurrentWorkspace
 
-%% PLOT RESULTS
-
-%run plotResults
+%% OBSERVER
