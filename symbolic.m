@@ -4,26 +4,26 @@ close all
 
 %% DEFINE VARIABLES
 %Params
-syms Cd m R J theta1 theta3 real
+syms Cd m R J real
 g = 9.81;
 %State 
 syms v omega theta2 real
 %Controls
 syms Tb real
 %Disturbances
-syms slope wind real
+syms theta1 theta3 slope wind dist_theta2 real
 %Noise
 syms nu_w nu_v real
 %Reference
 syms lambda_star real
 
 %% DEFINE VECTORS
-theta = [theta1; theta2; theta3];
-x = [v; omega; theta(2)];
+x = [v; omega; theta2];
 u = Tb;
-d = [wind; slope];
+d = [theta1; theta3; wind; slope; dist_theta2];
 nu = [nu_w; nu_v];
-w = [d; nu];
+ref = lambda_star;
+w = [d; nu; ref];
 
 %% DEFINE EQUATIONS
 % Aerodynamic drag
@@ -42,11 +42,11 @@ mu = sign(lambda) * theta1 * (1-exp(-abs(lambda)*theta2))-(lambda*theta3);
 Fx = N * mu;
 
 % System dynamics
-f = [(Fx/m)-(D/m)-g*sin(slope); R*(-Fx/J)+Tb/J; 0];
+f = [(Fx/m)-(D/m)-g*sin(slope); R*(-Fx/J)+Tb/J; dist_theta2];
 
 % System outputs
 h = [omega * (1 + nu_w); v + nu_v];
-% he = omega*(1 + nu_w) - ((v + nu_v)/R)*(1+lambda_star); % w(i.e. y_tacho) - w_r(i.e. w @ lambda_star) 
+%he = (((omega*(1 + nu_w)*R)-(v + nu_v))/(omega*(1 + nu_w)*R)) - lambda_star;
 he = (((omega*(1 + nu_w)*R)-(v + nu_v))/(v + nu_v)) - lambda_star;
 
 %% computing matrices

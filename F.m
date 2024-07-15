@@ -8,15 +8,18 @@ omega = x(2); % [rad/s] wheel speed
 theta2 = x(3); % theta2
 
 % DISTURBANCE
-wind = w(1);  % [m/s] wind speed
-slope = w(2); % [rad] road slope
+theta1 = w(1);
+theta3 = w(2);
+wind = w(3);  % [m/s] wind speed
+slope = w(4); % [rad] road slope
+dist_theta2 = w(5); 
 
 % NOISE
-nu = w(3:4); % [GNSS sensor [m/s]
+nu = w(6:7); % [GNSS sensor [m/s]
 %               tone-wheel [rad/s]];
 
 % REFERENCE
-%ref = w(5);
+ref = w(8);
 
 % CONTROL
 Tb = u; % [Nm] rear wheel torque
@@ -27,8 +30,6 @@ m = 250; % [kg] quarter-vehicle mass
 g = 9.81; % [m/s^2] gravity acceleration
 Ji = 1; % [kg*m^2] rear wheel inertia
 R_w = 0.3; % [m] rear wheel radius
-theta1=1.28;
-theta3=0.52; 
 %% STATE DYNAMICS
 
 % slip ratio
@@ -43,7 +44,7 @@ N = m*g*cos(slope);
 Fx = N * mu_w;
 
 % system dynamics
-dot_x = [-g*sin(slope)+Fx/m-D(v-wind)/m; (Tb - Fx*R_w)/Ji; 0];
+dot_x = [-g*sin(slope)+Fx/m-D(v-wind)/m; (Tb - Fx*R_w)/Ji; dist_theta2];
 
 %% MEASUREMENTS
 
@@ -51,8 +52,8 @@ y = [omega*(1+nu(1)); v + nu(2)];
 
 %% CONTROLLED VARIABLES
 
-lambda_star = -0.17;
-% e = y(1)-(y(2)/R_w)*(1+lambda_star);
+lambda_star = ref;
+% e = ((y(1)*R_w)-y(2))/(y(1)*R_w) - lambda_star;
 e = ((y(1)*R_w)-y(2))/y(2) - lambda_star;
 end
 

@@ -11,8 +11,8 @@ n = 3; % state
 p = 1; % control
 q = 2; % measurement
 lm = 1; % regulated output
-ld = 2; % disturbance
-r = ld+q; % exogenous
+ld = 5; % disturbance
+r = ld+q+lm; % exogenous
 
 %% nominal parameters
 
@@ -20,8 +20,6 @@ r = ld+q; % exogenous
 m = 250; % [kg] quarter-vehicle mass
 R_w = 0.3; % [m] wheel radius
 Ji = 1; % [kg*m^2] wheel inertia
-theta1=1.28;
-theta3=0.52;
 % aerodynamics
 rho = 1.225; % [kg/m^3] air density
 S = 1.6*1.2; % [m^2] cross section
@@ -33,6 +31,9 @@ slope0 = 0;
 wind0 = 0;
 nu_w = 0;
 nu_v = 0;
+theta1=1.28;
+theta3=0.52;
+dist_theta2_0 = 0;
 
 % friction coefficients
 %dry asphalt
@@ -64,8 +65,8 @@ var = fsolve(fun, var0);
 Tb_eq = var(1);
 lambda_eq = var(2);
 
-%omega0 = (lambda_eq*v0 + v0)/R_w;
-omega0 = - v0/(R_w*(lambda_eq-1));
+%omega0 = (lambda_eq*v0 + v0)/R_w; %braking
+omega0 = - v0/(R_w*(lambda_eq-1)); %driving
 
 %% Linearized plant
 %state
@@ -124,15 +125,13 @@ disp(strcat("The observable states are: ", num2str(rank(Omat))));
 %% INITIAL CONDITIONS
 tb0 = Tb_eq;
 
-theta0 = [theta1; theta0_2; theta3];
-
-x0 = [v0; omega0; theta0(2)];
+x0 = [v0; omega0; theta0_2];
 
 u0 = tb0;
 
-d0 = [wind0; slope0];
+d0 = [theta1; theta3; wind0; slope0; dist_theta2_0];
 
-w0 = [d0; nu_w; nu_v];
+w0 = [d0; nu_w; nu_v; lambda_star];
 
 y0 = [x0(2); x0(1)];
 
@@ -204,18 +203,22 @@ KS = K(:, 1:n_c);
 KI = K(:, n_c+1:end);
 
 %% OBSERVER
-lambda_d = 1;
+lambda_d = 0;
 Ad = Amat.';
 Bd = Cmat.';
 Cd = B2mat.';
 Dd = D2mat.';
 
-q1 = 2;
-q2 = atan(0.05);
-q3 = 0;
-q4 = 0;
+q1 = 0.05;
+q2 = 0.05;
+q3 = 2;
+q4 = atan(0.05);
+q5 = 0.05;
+q6 = 0;
+q7 = 0;
+q8 = 0;
 
-Qd = diag([q1^2, q2^2, q3^2, q4^4]);
+Qd = diag([q1^2, q2^2, q3^2, q4^4, q5^2, q6^2, q7^2, q8^2]);
 
 std_tacho = 0.01;
 std_GPS = 0.03;
