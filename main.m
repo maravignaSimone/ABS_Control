@@ -180,7 +180,7 @@ eps3max = 0.001;
 
 Q = inv(length(Ceps)*diag([eps1max ^2,eps2max^2, eps3max^2]));
 
-umax = 500;
+umax = 1000;
 
 R = inv(p*diag(umax ^2));
 
@@ -211,8 +211,8 @@ Dd = D2mat.';
 
 q1 = 0.05;
 q2 = 0.05;
-q3 = 2;
-q4 = atan(0.05);
+q3 = 10;
+q4 = atan(0.1);
 q5 = 0.05;
 q6 = 0;
 q7 = 0;
