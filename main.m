@@ -15,16 +15,27 @@ ld = 5; % disturbance
 r = ld+q+lm; % exogenous
 
 %% nominal parameters
-
+%LAMBORGHINI HURACAN
 % params
-m = 250; % [kg] quarter-vehicle mass
-R_w = 0.3; % [m] wheel radius
-Ji = 1; % [kg*m^2] wheel inertia
+m = 387.5; % [kg] quarter-vehicle mass
+R_w = 0.33; % [m] wheel radius
+Ji = 0.45; % [kg*m^2] wheel inertia
 % aerodynamics
 rho = 1.225; % [kg/m^3] air density
-S = 1.6*1.2; % [m^2] cross section
-CD = 2.2; % [-] drag resistance coefficient
+S = 1.75; % [m^2] cross section
+CD = 0.39; % [-] drag resistance coefficient
 Cd = 0.5*rho*S*CD; % drag coefficient (1/2)*rho*S*Cd
+
+%Other vehicle
+% % params
+% m = 250; % [kg] quarter-vehicle mass
+% R_w = 0.3; % [m] wheel radius
+% Ji = 1; % [kg*m^2] wheel inertia
+% % aerodynamics
+% rho = 1.225; % [kg/m^3] air density
+% S = 1.6*1.2; % [m^2] cross section
+% CD = 2.2; % [-] drag resistance coefficient
+% Cd = 0.5*rho*S*CD; % drag coefficient (1/2)*rho*S*Cd
 
 %% Linearization Conditions
 slope0 = 0;
@@ -45,7 +56,7 @@ lambda_star = -0.17;
 %theta3 = 0.35;
 %lambda_star= -0.131;
 
-v0 = 20; % [m/s] initial velocity
+v0 = 130/3.6; % [m/s] initial velocity
 
 %%
 
@@ -176,11 +187,11 @@ Deps = zeros(n_c+lm, p);
 
 eps1max = v0;
 eps2max = omega0;
-eps3max = 0.001;
+eps3max = 0.0005;
 
 Q = inv(length(Ceps)*diag([eps1max ^2,eps2max^2, eps3max^2]));
 
-umax = 1000;
+umax = 700;
 
 R = inv(p*diag(umax ^2));
 
@@ -213,7 +224,7 @@ q1 = 0.05;
 q2 = 0.05;
 q3 = 10;
 q4 = atan(0.1);
-q5 = 0.05;
+q5 = 0.1;
 q6 = 0;
 q7 = 0;
 q8 = 0;
@@ -221,7 +232,7 @@ q8 = 0;
 Qd = diag([q1^2, q2^2, q3^2, q4^4, q5^2, q6^2, q7^2, q8^2]);
 
 std_tacho = 0.01;
-std_GPS = 0.03;
+std_GPS = 0.05;
 
 Rd = diag([std_tacho^2, std_GPS^2]);
 
@@ -243,9 +254,6 @@ BO = B1mat - KO*D1mat;
 CO = eye(n);
 DO = zeros(n, q);
 XOinit = x_init - x0;
-
-%% FEED FORWARD
-
 
 %% RUN THE SIMULATOR
 PLANT = 1; % 0 = linear, 1 = nonlinear
@@ -270,11 +278,3 @@ nexttile;
 plot(out.lambda, LineWidth=1);
 title("Slip Ratio $\lambda$", Interpreter="latex");
 title(t, strcat("Result of the control with $\epsilon_1$=",num2str(eps1max), ", $\epsilon_2$=", num2str(eps2max), ", $\epsilon_3$=", num2str(eps3max), ", $u_{max}$=", num2str(umax)), Interpreter="latex");
-
-%% Simulink model
-%out = sim('SimulinkModel',TimeSpan);
-%save CurrentWorkspace
-
-%% PLOT RESULTS
-
-%run plotResults
