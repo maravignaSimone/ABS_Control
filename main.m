@@ -231,8 +231,8 @@ q8 = 0;
 
 Qd = diag([q1^2, q2^2, q3^2, q4^4, q5^2, q6^2, q7^2, q8^2]);
 
-std_tacho = 0.01;
-std_GPS = 0.05;
+std_tacho = 0.05;
+std_GPS = 0.01;
 
 Rd = diag([std_tacho^2, std_GPS^2]);
 
