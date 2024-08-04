@@ -26,17 +26,6 @@ S = 1.75; % [m^2] cross section
 CD = 0.39; % [-] drag resistance coefficient
 Cd = 0.5*rho*S*CD; % drag coefficient (1/2)*rho*S*Cd
 
-%Other vehicle
-% % params
-% m = 250; % [kg] quarter-vehicle mass
-% R_w = 0.3; % [m] wheel radius
-% Ji = 1; % [kg*m^2] wheel inertia
-% % aerodynamics
-% rho = 1.225; % [kg/m^3] air density
-% S = 1.6*1.2; % [m^2] cross section
-% CD = 2.2; % [-] drag resistance coefficient
-% Cd = 0.5*rho*S*CD; % drag coefficient (1/2)*rho*S*Cd
-
 %% Linearization Conditions
 slope0 = 0;
 wind0 = 0;
@@ -49,14 +38,12 @@ dist_theta2_0 = 0;
 % friction coefficients
 %dry asphalt
 theta0_2=23.99;
-lambda_star = -0.17;
 %wet asphalt
 %theta1 = 0.86;
 %theta0_2 = 33.82;
 %theta3 = 0.35;
-%lambda_star= -0.131;
 
-v0 = 130/3.6; % [m/s] initial velocity
+v0 = 100/3.6; % [m/s] initial velocity
 
 %%
 
@@ -90,13 +77,7 @@ Cmat = ABS_Cmatrix(nu_w);
 D1mat = ABS_D1matrix;
 D2mat = ABS_D2matrix(omega0);
 
-%error
-% he = omega - omega_ref
-% Cemat = ABS_Cematrix(R_w,lambda_star,nu_w);
-% D1emat = ABS_D1ematrix;
-% D2emat = ABS_D2ematrix(R_w,lambda_star,omega0);
-
-% he: lambda - lambda_star
+% error: lambda - lambda_star
 Cemat = ABS_Cematrix(R_w,nu_v,nu_w, omega0, v0);
 D1emat = ABS_D1ematrix;
 D2emat = ABS_D2ematrix(R_w,nu_v,nu_w,omega0,v0);
@@ -142,7 +123,7 @@ u0 = tb0;
 
 d0 = [theta1; theta3; wind0; slope0; dist_theta2_0];
 
-w0 = [d0; nu_w; nu_v; lambda_star];
+w0 = [d0; nu_w; nu_v; 0];
 
 y0 = [x0(2); x0(1)];
 
@@ -167,7 +148,6 @@ Auc = A_bar(1:k, 1:k);
 Buc = B1_bar(1:k, :);
 Cuc = C_bar(:, 1:k);
 
-% Augment with integral action
 n_c = size(Acc, 1);
 
 % Pick the equivalent state and tell what are the reachable ones
@@ -191,7 +171,7 @@ eps3max = 0.0005;
 
 Q = inv(length(Ceps)*diag([eps1max ^2,eps2max^2, eps3max^2]));
 
-umax = 700;
+umax = 500;
 
 R = inv(p*diag(umax ^2));
 
@@ -220,10 +200,10 @@ Bd = Cmat.';
 Cd = B2mat.';
 Dd = D2mat.';
 
-q1 = 0.05;
-q2 = 0.05;
-q3 = 10;
-q4 = atan(0.1);
+q1 = 0.1;
+q2 = 0.1;
+q3 = 30/3.6;
+q4 = atan(5/100);
 q5 = 0.1;
 q6 = 0;
 q7 = 0;

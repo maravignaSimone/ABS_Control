@@ -26,10 +26,10 @@ Tb = u; % [Nm] rear wheel torque
 
 %% ACTUAL PLANT PARAMETERS
 
-m = 250; % [kg] quarter-vehicle mass
+m = 387.5; % [kg] quarter-vehicle mass
 g = 9.81; % [m/s^2] gravity acceleration
-Ji = 1; % [kg*m^2] rear wheel inertia
-R_w = 0.3; % [m] rear wheel radius
+Ji = 0.45; % [kg*m^2] rear wheel inertia
+R_w = 0.33; % [m] rear wheel radius
 %% STATE DYNAMICS
 
 % slip ratio
@@ -79,8 +79,8 @@ end
 % air drag
 function out = D(v)
 rho = 1.225; % [kg/m^3] air density
-S = 1.6*1.2; % [m^2] cross section
-CD = 2.2; % [-] drag resistance coefficeint
+S = 1.75; % [m^2] cross section
+CD = 0.39; % [-] drag resistance coefficeint
 
 out = 0.5*rho*S*CD*(v^2);
 end
