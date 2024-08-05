@@ -200,11 +200,11 @@ Bd = Cmat.';
 Cd = B2mat.';
 Dd = D2mat.';
 
-q1 = 0.1;
-q2 = 0.1;
-q3 = 30/3.6;
-q4 = atan(5/100);
-q5 = 0.1;
+q1 = 0.1; %theta1
+q2 = 0.1; %theta3
+q3 = 30/3.6; %wind
+q4 = atan(5/100); %slope
+q5 = 0.1; %theta2
 q6 = 0;
 q7 = 0;
 q8 = 0;
